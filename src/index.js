@@ -12,6 +12,7 @@ function exitRouter(options, exitCode) {
 
 const scrapper = new Scrapper();
 
+//Script init
 const start = async () => {
     await scrapper.init();
 }
@@ -20,6 +21,8 @@ const start = async () => {
     await start()
 })()
 
+
+// Runs on stopping the script
 function exitHandler(exitCode) {
     console.log(`ExitCode ${exitCode}`);
     scrapper.dumpToCSV();
