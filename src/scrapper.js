@@ -14,6 +14,7 @@ export class Scrapper {
             console.log("INITIALIZING SCRAPPER");
             this.totalPages = await this.fetchTotalPages();
             let currPage = 1
+            // DO for all pages
             while (currPage <= this.totalPages) {
                 await this.getHomePageQuestionsDetails(`${LINKS.SO_QUESTION}/?page=${currPage}`);
                 await this.sleep(3000)
@@ -24,6 +25,7 @@ export class Scrapper {
         }
     }
 
+    // get each ques on every page
     async getHomePageQuestionsDetails(link) {
         try {
             const res = await fetch(link);
@@ -41,6 +43,7 @@ export class Scrapper {
                     this.questions[q.questionLink] = q
                     // fetch next 5 questions
                     const { $, html } = await this.getQuestionPageHTML(q.questionLink);
+                    // get related links
                     const related = this.getRelatedLink($, html);
                     console.log("related: ", related.length);
                     let currentPromises = [];
@@ -83,34 +86,37 @@ export class Scrapper {
             console.error("Err: ", error);
         }
     }
-
+    // extracting each question details 
     async getQuestionDetailsFromQPage(link) {
         try {
-            const res = await fetch(`${LINKS.SO_QUESTION}/${link}`);
+            const res = await fetch(`${LINKS.SO_HOME}/${link}`);
             const text = await res.text();
             const $ = load(text);
             const html = $.html();
-            $(html).find('#question > div.post-layout > div.votecell.post-layout--left > div > div.js-vote-count.flex--item.d-flex.fd-column.ai-center.fc-black-500.fs-title').map((_, ele) => {
-                console.log("Vote count: " + $(ele).attr('data-value'));
-            })
-            $(html).find('#answers-header > div > div.flex--item.fl1 > h2').map((_, ele) => {
-                console.log("Answer count: " + $(ele).attr('data-answercount'));
-            })
+            // ------- DEbugging logs
+            // $(html).find('#question > div.post-layout > div.votecell.post-layout--left > div > div.js-vote-count.flex--item.d-flex.fd-column.ai-center.fc-black-500.fs-title').map((_, ele) => {
+            //     console.log("Vote count: " + $(ele).attr('data-value'));
+            // })
+            // $(html).find('#answers-header > div > div.flex--item.fl1 > h2').map((_, ele) => {
+            //     console.log("Answer count: " + $(ele).attr('data-answercount'));
+            // })
+            // console.log($(`head > meta[property=og:title]`).attr());
+            // ----------------------
 
+            // if question is not extracted before
             if (!(link in this.questions)) {
                 this.questions[link] = {
                     questionLink: link,
-                    title: "will be fetched from page",
-                    answerCount:0, 
-                    // $(html).find('#answers-header > div > div.flex--item.fl1 > h2').attr('data-answercount') ?? 'Will be fetched later',
-                    upvotes:0 ,
-                    // $(html).find('#question > div.post-layout > div.votecell.post-layout--left > div > div.js-vote-count.flex--item.d-flex.fd-column.ai-center.fc-black-500.fs-title').attr('data-value') ?? 'Will be fetched later',
+                    title: $(`head > meta[property=og:title]`).attr('content'),
+                    answerCount: $(html).find('#answers-header > div > div.flex--item.fl1 > h2').attr('data-answercount') ?? 'Will be fetched later',
+                    upvotes:  $(html).find('#question > div.post-layout > div.votecell.post-layout--left > div > div.js-vote-count.flex--item.d-flex.fd-column.ai-center.fc-black-500.fs-title').attr('data-value') ?? 'Will be fetched later',
                     count: 1
                 }           
-            } else {
+            } 
+            // if already extracted - increement counter of visits
+            else {
                 this.questions[link].count = this.questions[link].count + 1;
             }
-            // to avoid 
             await this.sleep(100)
         } catch (error) {
             console.error("Err: ", error);
@@ -163,6 +169,7 @@ export class Scrapper {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    // dump to CSV file
     dumpToCSV() {
         let data = 'Question,Answer Count,Upvotes,Count\n';
         for (let ques in this.questions) {

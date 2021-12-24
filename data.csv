@@ -1,7 +1,7 @@
 Question,Answer Count,Upvotes,Count
-Why does if -else if ladder statement fail to give me the required output?,0,0,1
-will be fetched from page,Will be fetched later,Will be fetched later,1
-will be fetched from page,Will be fetched later,Will be fetched later,1
-will be fetched from page,Will be fetched later,Will be fetched later,1
-will be fetched from page,Will be fetched later,Will be fetched later,1
-will be fetched from page,Will be fetched later,Will be fetched later,1
+Laravel route returns 404 not found. I dont know why....?,0,0,1
+Laravel 404 Not Found - But Route Exists,2,0,1
+Laravel route showing "Not Found",2,1,1
+Reference - What does this error mean in PHP?,37,1222,1
+Reference — What does this symbol mean in PHP?,21,4844,1
+Route [login] not defined,19,69,1
